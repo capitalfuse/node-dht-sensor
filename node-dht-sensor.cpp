@@ -204,7 +204,7 @@ using namespace v8;
 int GPIOPort = 4;
 int SensorType = 11;
 
-void Read(const Nan::FunctionCallbackInfo<Value>& args) {
+void Read(const Nan::FunctionCallbackInfo<Value>& info) {
     float temperature = 0, humidity = 0;
     int retry = 3;
     int result = 0;
@@ -219,16 +219,16 @@ void Read(const Nan::FunctionCallbackInfo<Value>& args) {
     readout->Set(Nan::New("isValid").ToLocalChecked(), Nan::New<Boolean>(result == 0));
     readout->Set(Nan::New("errors").ToLocalChecked(), Nan::New<Number>(2 - retry));
 
-    args.GetReturnValue().Set(readout);
+    info.GetReturnValue().Set(readout);
 }
 
-void ReadSpec(const Nan::FunctionCallbackInfo<Value>& args) {
-    if (args.Length() < 2) {
+void ReadSpec(const Nan::FunctionCallbackInfo<Value>& info) {
+    if (info.Length() < 2) {
     	Nan::ThrowTypeError("Wrong number of arguments");
     	return;
     }
 
-    int sensorType = args[0]->Uint32Value();
+    int sensorType = info[0]->Uint32Value();
     if (sensorType != 11 && sensorType != 22) {
         Nan::ThrowTypeError("Specified sensor type is invalid");
         return;
@@ -242,7 +242,7 @@ void ReadSpec(const Nan::FunctionCallbackInfo<Value>& args) {
         }
     }
 
-    int gpio = args[1]->Uint32Value();
+    int gpio = info[1]->Uint32Value();
     float temperature = 0, humidity = 0;
     int retry = 3;
     int result = 0;
@@ -257,22 +257,22 @@ void ReadSpec(const Nan::FunctionCallbackInfo<Value>& args) {
     readout->Set(Nan::New("isValid").ToLocalChecked(), Nan::New<Boolean>(result == 0));
     readout->Set(Nan::New("errors").ToLocalChecked(), Nan::New<Number>(2 - retry));
     
-    args.GetReturnValue().Set(readout);
+    info.GetReturnValue().Set(readout);
 }
 
-void Initialize(const Nan::FunctionCallbackInfo<Value>& args) {
+void Initialize(const Nan::FunctionCallbackInfo<Value>& info) {
     
-    if (args.Length() < 2) {
+    if (info.Length() < 2) {
         Nan::ThrowTypeError("Wrong number of arguments");
     	return;
     }
     
-    if (!args[0]->IsNumber() || !args[1]->IsNumber()) {
+    if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
         Nan::ThrowTypeError("Invalid arguments");
     	return;
     }
     
-    int sensorType = args[0]->Uint32Value();
+    int sensorType = info[0]->Uint32Value();
     if (sensorType != 11 && sensorType != 22) {
     	Nan::ThrowTypeError("Specified sensor type is not supported");
     	return;
@@ -280,9 +280,9 @@ void Initialize(const Nan::FunctionCallbackInfo<Value>& args) {
     
     // update parameters
     SensorType = sensorType;
-    GPIOPort = args[1]->Uint32Value();
+    GPIOPort = info[1]->Uint32Value();
     
-    args.GetReturnValue().Set(Nan::New<Boolean>(initialize() == 0));
+    info.GetReturnValue().Set(Nan::New<Boolean>(initialize() == 0));
 }
 
 void Init(Handle<Object> exports) {
